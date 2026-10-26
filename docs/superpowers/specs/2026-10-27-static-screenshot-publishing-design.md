@@ -21,6 +21,8 @@
 
 `assets/` 现已由构建脚本复制到 Pages 输出目录，新增的截图文件会随构建自然发布。无需使用 D1 存放截图元数据；现有 D1 截图表不做删除或破坏性迁移，避免影响可能已有的数据。评论、统计仍照旧由 D1 管理。
 
+当前本地 Wrangler R2 模拟桶中已有 5 张截图（video 2 张、wallpaper 3 张），本地 D1 保存了它们的 ID 和顺序。实施时先把这些对象导出到 `assets/screenshots/`，并在静态 manifest 中保留 ID、软件归属、MIME、大小和顺序。导出后不删除 `.wrangler` 中的原始桶数据。当前 Cloudflare 远程 D1 尚无 `software_screenshots` 表，因此没有已知远程截图需要搬迁。
+
 ### 自动部署
 
 新增 GitHub Actions 工作流：对 `main` 的推送运行构建，再通过 Wrangler 发布 `dist/` 和 Pages Functions 到 `yuanji-hub`。因为 Pages 项目未绑定 Git Provider，工作流需要 GitHub Actions secrets：Cloudflare Account ID 和具有 Pages Edit 权限的 Cloudflare API Token。
@@ -41,7 +43,7 @@ Cloudflare Pages Functions 需要 `GITHUB_TOKEN` secret，使用仅对 `xiaojoo/
 - 令牌只保存在 Cloudflare secret 和 GitHub Actions secret 中；不记录令牌或上传内容到日志。
 - 管理写操作继续要求已登录 session 和 same-origin 校验。
 - 删除图片通过新 Git commit 删除对应静态文件并更新 manifest；Git 历史仍保留旧版本，符合 Git 的历史特性。
-- 公开图片 URL 可經 Pages CDN 緩存；manifest 與圖片在同一次部署內发布，避免页面引用未上传的文件。
+- 公开图片 URL 可经 Pages CDN 缓存；manifest 与图片在同一次部署内发布，避免页面引用未上传的文件。
 
 ## 验收标准
 
