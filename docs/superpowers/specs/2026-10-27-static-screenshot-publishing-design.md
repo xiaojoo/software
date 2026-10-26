@@ -32,6 +32,7 @@ Cloudflare Pages Functions 需要 `GITHUB_TOKEN` secret，使用仅对 `xiaojoo/
 ### 用户可见行为
 
 - 管理后台上传成功代表图片和 manifest 已提交到 `main`，提示“已保存，网站将在部署完成后更新”。
+- 一次选择多张图片时，所有图片与清单合并成一个提交，只触发一次部署。
 - GitHub Actions 随推送启动 Pages 部署；部署完成后前台展示图片。
 - 后台列表从 GitHub 当前清单读取；排序和删除同样提交新的仓库版本。
 - 前台加载静态清单；清单为空或加载失败时完全隐藏截图区域。

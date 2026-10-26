@@ -71,14 +71,14 @@
 **Interfaces:**
 - Keep existing routes and response shape: `GET /api/admin/screenshots?software=...`, `POST /api/admin/screenshots`, `PATCH /api/admin/screenshots`, and `DELETE /api/admin/screenshots/:id`.
 - `GET` maps selected software manifest rows to `{ id, softwareId, url, mimeType, sizeBytes, order, pendingCleanup: false, createdAt }`.
-- `POST` commits each accepted image and updated manifest; `PATCH` commits the reordered manifest; `DELETE` commits removal of the image file and manifest row together.
+- `POST` accepts all selected images and commits the image files plus one updated manifest in one commit; `PATCH` commits the reordered manifest; `DELETE` commits removal of the image file and manifest row together.
 - Keep authentication, same-origin checks, known-software validation, MIME sniffing, and 10 MiB per-file limit.
 
 - [ ] Replace the R2/D1 read path with manifest filtering; return 503 with a clear message when GitHub configuration or API is unavailable.
-- [ ] On upload, allocate UUID filenames, validate the image, then atomically commit image bytes and manifest JSON.
+- [ ] On upload, accept repeated `image` multipart fields, validate every file before writing, allocate UUID filenames, then atomically commit all image bytes and the updated manifest in one GitHub commit.
 - [ ] On reorder, require each current screenshot ID exactly once and write contiguous zero-based order values.
 - [ ] On delete, find the row by both software ID and screenshot ID, then atomically remove its file and manifest entry.
-- [ ] Update admin success copy to say the image is saved to GitHub and will appear after deployment; keep failure copy tied to the failed operation.
+- [ ] Update admin upload to send all selected files in one request and show one status; success copy says images are saved to GitHub and will appear after one deployment, while failure leaves the file selection available for retry.
 - [ ] Commit the endpoint and admin changes.
 
 ### Task 4: Serve screenshots from Pages static assets and remove R2 bindings
