@@ -5,10 +5,6 @@ pages_build_output_dir = "./dist"
 
 [env.production]
 
-[[env.production.r2_buckets]]
-binding = "SCREENSHOTS"
-bucket_name = "yuanji-hub-screenshots"
-
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "software-finder-db"
@@ -20,7 +16,3 @@ binding = "DB"
 database_name = "software-finder-db"
 database_id = "a0c7cc4e-1f98-4020-a4a3-85929adb67d9"
 migrations_dir = "./migrations"
-
-[[r2_buckets]]
-binding = "SCREENSHOTS"
-bucket_name = "yuanji-hub-screenshots"

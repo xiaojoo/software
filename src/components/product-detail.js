@@ -268,17 +268,19 @@ class ProductDetail extends HTMLElement {
     hideShowcase();
 
     try {
-      const response = await fetch(`/api/screenshots?software=${encodeURIComponent(softwareId)}`);
+      const response = await fetch('/assets/screenshots/manifest.json');
       if (!response.ok) return;
       const { screenshots = [] } = await response.json();
       if (this._product?.id !== softwareId || this._screenshotRequestId !== requestId) return;
       list.replaceChildren();
-      screenshots.forEach((screenshot, index) => {
-        if (typeof screenshot.url !== 'string') return;
+      screenshots.filter((screenshot) => screenshot.softwareId === softwareId)
+        .sort((a, b) => a.order - b.order)
+        .forEach((screenshot, index) => {
+        if (typeof screenshot.path !== 'string' || !screenshot.path.startsWith('/assets/screenshots/')) return;
         const figure = document.createElement('figure');
         figure.className = 'product-screenshot-image';
         const image = document.createElement('img');
-        image.src = screenshot.url;
+        image.src = screenshot.path;
         image.alt = `${this._product.name}截图 ${index + 1}`;
         image.loading = 'lazy';
         image.decoding = 'async';

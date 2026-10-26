@@ -12,21 +12,8 @@ export interface D1Database {
   batch(statements: D1Statement[]): Promise<unknown[]>;
 }
 
-export interface R2ObjectBody {
-  body: ReadableStream<Uint8Array>;
-  size: number;
-  httpMetadata?: { contentType?: string };
-}
-
-export interface R2Bucket {
-  get(key: string): Promise<R2ObjectBody | null>;
-  put(key: string, value: ArrayBuffer | ArrayBufferView | ReadableStream, options?: { httpMetadata?: { contentType?: string } }): Promise<unknown>;
-  delete(key: string): Promise<void>;
-}
-
 export interface Env {
   DB?: D1Database;
-  SCREENSHOTS?: R2Bucket;
   GITHUB_TOKEN?: string;
   ADMIN_USERNAME?: string;
   ADMIN_PASSWORD?: string;
