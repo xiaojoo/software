@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "screenshots": [
+    {
+      "id": "4a69d144-5c5f-4e75-b480-1f7aeba9f50f",
+      "softwareId": "video",
+      "objectKey": "video-4a69d144-5c5f-4e75-b480-1f7aeba9f50f.png",
+      "path": "/assets/screenshots/video-4a69d144-5c5f-4e75-b480-1f7aeba9f50f.png",
+      "mimeType": "image/png",
+      "sizeBytes": 1282351,
+      "order": 0,
+      "createdAt": "2026-10-26T15:19:14.294Z"
+    },
+    {
+      "id": "cfad7f4e-806a-4395-a891-dedddebcea91",
+      "softwareId": "video",
+      "objectKey": "video-cfad7f4e-806a-4395-a891-dedddebcea91.png",
+      "path": "/assets/screenshots/video-cfad7f4e-806a-4395-a891-dedddebcea91.png",
+      "mimeType": "image/png",
+      "sizeBytes": 169379,
+      "order": 1,
+      "createdAt": "2026-10-26T15:19:14.316Z"
+    },
+    {
+      "id": "6a827684-dbde-4357-8c3a-c62e7720786b",
+      "softwareId": "wallpaper",
+      "objectKey": "wallpaper-6a827684-dbde-4357-8c3a-c62e7720786b.png",
+      "path": "/assets/screenshots/wallpaper-6a827684-dbde-4357-8c3a-c62e7720786b.png",
+      "mimeType": "image/png",
+      "sizeBytes": 355449,
+      "order": 0,
+      "createdAt": "2026-10-26T15:25:06.282Z"
+    },
+    {
+      "id": "8bce0215-8bbc-4e13-8a40-0a1f81e96630",
+      "softwareId": "wallpaper",
+      "objectKey": "wallpaper-8bce0215-8bbc-4e13-8a40-0a1f81e96630.png",
+      "path": "/assets/screenshots/wallpaper-8bce0215-8bbc-4e13-8a40-0a1f81e96630.png",
+      "mimeType": "image/png",
+      "sizeBytes": 1608302,
+      "order": 1,
+      "createdAt": "2026-10-26T15:25:06.315Z"
+    },
+    {
+      "id": "56bc9290-9d47-471d-a93b-f8695bef57d1",
+      "softwareId": "wallpaper",
+      "objectKey": "wallpaper-56bc9290-9d47-471d-a93b-f8695bef57d1.png",
+      "path": "/assets/screenshots/wallpaper-56bc9290-9d47-471d-a93b-f8695bef57d1.png",
+      "mimeType": "image/png",
+      "sizeBytes": 1193719,
+      "order": 2,
+      "createdAt": "2026-10-26T15:25:06.343Z"
+    }
+  ]
+}
