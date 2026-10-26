@@ -17,7 +17,7 @@
 
 仓库中的 `assets/screenshots/` 是唯一的截图源。每张图片使用生成的 UUID 文件名，扩展名根据经过文件头校验的 PNG、JPEG 或 WebP MIME 类型确定。`assets/screenshots/manifest.json` 保存软件 ID、图片路径、MIME 类型、大小和显示顺序。
 
-上传、删除和排序都通过 GitHub Git Data API 完成。每次操作读取 `main` 当前提交，构造包含图片变更和 manifest 变更的 Git tree，并更新一个 commit/ref，保证图片与清单一起进入同一提交。并发更新发生冲突时返回可理解的错误，不强制覆盖远端提交。管理 API 从 GitHub API 读取清单；前台使用已发布的静态 manifest 和图片 URL。
+上传、删除和排序都通过 GitHub Git Data API 完成。每次操作读取 `main` 当前提交及该提交中的 manifest，构造包含图片变更和 manifest 变更的 Git tree，并更新一个 commit/ref，保证图片与清单一起进入同一提交。提交前比对分支 SHA；如果清单读取后远端发生变化，或 ref 更新时出现非快进冲突，则拒绝提交并提示刷新，避免旧清单覆盖新变更。管理 API 从 GitHub API 读取清单；前台使用已发布的静态 manifest 和图片 URL。
 
 `assets/` 现已由构建脚本复制到 Pages 输出目录，新增的截图文件会随构建自然发布。无需使用 D1 存放截图元数据；现有 D1 截图表不做删除或破坏性迁移，避免影响可能已有的数据。评论、统计仍照旧由 D1 管理。
 
@@ -40,7 +40,7 @@ Cloudflare Pages Functions 需要 `GITHUB_TOKEN` secret，使用仅对 `xiaojoo/
 
 ## 失败处理与安全
 
-- GitHub API 非成功响应、权限不足、API 限流、分支更新冲突均返回明确的非成功响应；仅在 GitHub commit 成功后向后台报告保存成功。
+- GitHub API 非成功响应、权限不足、API 限流、读取与写入间的分支版本变化均返回明确的非成功响应；仅在 GitHub commit 成功后向后台报告保存成功。
 - 令牌只保存在 Cloudflare secret 和 GitHub Actions secret 中；不记录令牌或上传内容到日志。
 - 管理写操作继续要求已登录 session 和 same-origin 校验。
 - 删除图片通过新 Git commit 删除对应静态文件并更新 manifest；Git 历史仍保留旧版本，符合 Git 的历史特性。

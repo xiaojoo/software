@@ -51,8 +51,8 @@
 
 **Interfaces:**
 - Add `GITHUB_TOKEN?: string` to `Env`.
-- `readScreenshotManifest(env: Env): Promise<ScreenshotManifest>` reads `assets/screenshots/manifest.json` from `xiaojoo/software` branch `main` and returns an empty version-1 manifest only when the path is not yet present.
-- `commitScreenshotChanges(env: Env, message: string, changes: Array<{ path: string; bytes?: Uint8Array; delete?: boolean }>): Promise<void>` creates blobs, a tree, a commit, and advances `refs/heads/main` without force. Use the prior head as the parent and base tree; surface API, permission, and ref-conflict errors without exposing the token.
+- `readScreenshotManifest(env: Env): Promise<{ manifest: ScreenshotManifest; headSha: string }>` reads `assets/screenshots/manifest.json` pinned to the `main` ref SHA from `xiaojoo/software`; it returns an empty version-1 manifest only when that path is not present.
+- `commitScreenshotChanges(env: Env, message: string, changes: Array<{ path: string; bytes?: Uint8Array; delete?: boolean }>, expectedHeadSha: string): Promise<void>` checks the current `main` SHA matches `expectedHeadSha`, then creates blobs, a tree, a commit, and advances `refs/heads/main` without force. Use the current head as parent/base tree; surface API, permission, and ref-conflict errors without exposing the token.
 - Encode binary blob content with Web APIs available in Workers; do not depend on Node `Buffer` in Pages Functions.
 
 - [ ] Define repository constants and the versioned manifest types in the helper.

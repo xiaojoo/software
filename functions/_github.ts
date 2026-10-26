@@ -28,6 +28,11 @@ export interface ScreenshotManifest {
   screenshots: ScreenshotRecord[];
 }
 
+export interface ScreenshotRepositoryState {
+  manifest: ScreenshotManifest;
+  headSha: string;
+}
+
 export interface ScreenshotChange {
   path: string;
   bytes?: Uint8Array;
@@ -179,15 +184,16 @@ function parseManifest(value: unknown): ScreenshotManifest {
   return { version: 1, screenshots };
 }
 
-export async function readScreenshotManifest(env: Env): Promise<ScreenshotManifest> {
+export async function readScreenshotManifest(env: Env): Promise<ScreenshotRepositoryState> {
   const path = MANIFEST_PATH.split('/').map(encodeURIComponent).join('/');
-  await githubFetch(env, `/git/ref/heads/${BRANCH}`);
+  const reference = await githubFetch(env, `/git/ref/heads/${BRANCH}`);
+  const { object: { sha: headSha } } = await reference.json() as GitReferenceResponse;
   let response: Response;
   try {
-    response = await githubFetch(env, `/contents/${path}?ref=${encodeURIComponent(BRANCH)}`);
+    response = await githubFetch(env, `/contents/${path}?ref=${encodeURIComponent(headSha)}`);
   } catch (error) {
     if (error instanceof ScreenshotRepositoryError && error.status === 404) {
-      return { version: 1, screenshots: [] };
+      return { manifest: { version: 1, screenshots: [] }, headSha };
     }
     throw error;
   }
@@ -202,7 +208,7 @@ export async function readScreenshotManifest(env: Env): Promise<ScreenshotManife
   } catch {
     throw new ScreenshotRepositoryError('截图清单不是有效的 JSON。', 'invalid-manifest');
   }
-  return parseManifest(value);
+  return { manifest: parseManifest(value), headSha };
 }
 
 interface GitReferenceResponse {
@@ -229,6 +235,7 @@ export async function commitScreenshotChanges(
   env: Env,
   message: string,
   changes: ScreenshotChange[],
+  expectedHeadSha: string,
 ): Promise<void> {
   requireToken(env);
   if (!changes.length) throw new Error('没有需要提交的截图变更。');
@@ -248,6 +255,9 @@ export async function commitScreenshotChanges(
 
   const reference = await githubFetch(env, `/git/ref/heads/${BRANCH}`);
   const { object: { sha: headSha } } = await reference.json() as GitReferenceResponse;
+  if (headSha !== expectedHeadSha) {
+    throw new ScreenshotRepositoryError('截图仓库分支已被其他操作更新，请刷新列表后重试。', 'conflict');
+  }
   const currentCommitResponse = await githubFetch(env, `/git/commits/${encodeURIComponent(headSha)}`);
   const { tree: { sha: baseTreeSha } } = await currentCommitResponse.json() as GitCommitResponse;
 

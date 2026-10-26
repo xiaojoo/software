@@ -36,7 +36,7 @@ export async function onRequestGet(context: PagesContext) {
   const softwareId = new URL(context.request.url).searchParams.get('software') ?? '';
   if (!findSoftware(softwareId)) return json({ error: 'Unknown software.' }, 400);
   try {
-    const manifest = await readScreenshotManifest(context.env);
+    const { manifest } = await readScreenshotManifest(context.env);
     const screenshots = manifest.screenshots
       .filter((item) => item.softwareId === softwareId)
       .sort((a, b) => a.order - b.order)
@@ -70,7 +70,7 @@ export async function onRequestPost(context: PagesContext) {
   }
 
   try {
-    const manifest = await readScreenshotManifest(context.env);
+    const { manifest, headSha } = await readScreenshotManifest(context.env);
     const productScreenshots = manifest.screenshots.filter((item) => item.softwareId === softwareId);
     let nextOrder = productScreenshots.reduce((max, item) => Math.max(max, item.order), -1) + 1;
     const now = new Date().toISOString();
@@ -88,8 +88,9 @@ export async function onRequestPost(context: PagesContext) {
 
     const updated = { version: 1 as const, screenshots: [...manifest.screenshots, ...records] };
     changes.push({ path: 'assets/screenshots/manifest.json', bytes: new TextEncoder().encode(`${JSON.stringify(updated, null, 2)}\n`) });
-    await commitScreenshotChanges(context.env, `Add ${records.length} screenshot${records.length === 1 ? '' : 's'} for ${softwareId}`, changes);
-    return json({ screenshots: records.map(publicRow), count: records.length }, 201, { 'Cache-Control': 'no-store' });
+    await commitScreenshotChanges(context.env, `Add ${records.length} screenshot${records.length === 1 ? '' : 's'} for ${softwareId}`, changes, headSha);
+    const screenshots = records.map(publicRow);
+    return json({ screenshot: screenshots[0], screenshots, count: records.length }, 201, { 'Cache-Control': 'no-store' });
   } catch (error) {
     return errorResponse(error, '无法保存截图到 GitHub。');
   }
@@ -107,7 +108,7 @@ export async function onRequestPatch(context: PagesContext) {
     return json({ error: 'Invalid screenshot order.' }, 400);
   }
   try {
-    const manifest = await readScreenshotManifest(context.env);
+    const { manifest, headSha } = await readScreenshotManifest(context.env);
     const current = manifest.screenshots.filter((item) => item.softwareId === softwareId).sort((a, b) => a.order - b.order);
     const currentIds = current.map((item) => item.id).sort();
     const requestedIds = [...ids as string[]].sort();
@@ -121,7 +122,7 @@ export async function onRequestPatch(context: PagesContext) {
     const updated = { version: 1 as const, screenshots };
     await commitScreenshotChanges(context.env, `Reorder screenshots for ${softwareId}`, [
       { path: 'assets/screenshots/manifest.json', bytes: new TextEncoder().encode(`${JSON.stringify(updated, null, 2)}\n`) },
-    ]);
+    ], headSha);
     return json({ orderedIds: ids }, 200, { 'Cache-Control': 'no-store' });
   } catch (error) {
     return errorResponse(error, '无法保存截图顺序。');

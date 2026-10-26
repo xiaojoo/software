@@ -467,11 +467,11 @@ async function uploadScreenshots(event) {
     const { count = files.length } = await api('/api/admin/screenshots', { method: 'POST', body: form });
     input.value = '';
     updateFileSelectionFeedback();
+    await loadScreenshots();
     setStatus(status, `已保存 ${count} 张截图到 GitHub，网站将在部署完成后更新。`);
-    await loadScreenshots();
   } catch (error) {
-    setStatus(status, error.message, true);
     await loadScreenshots();
+    setStatus(status, error.message, true);
   } finally { button.disabled = false; }
 }
 
@@ -490,7 +490,7 @@ async function moveScreenshot(index, offset) {
 async function deleteScreenshot(id) {
   const status = app.querySelector('#screenshot-status');
   try {
-    await api(`/api/admin/screenshots/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    await api(`/api/admin/screenshots/${encodeURIComponent(id)}?software=${encodeURIComponent(state.softwareId)}`, { method: 'DELETE' });
     setStatus(status, '截图已删除。');
     await loadScreenshots();
   } catch (error) {
