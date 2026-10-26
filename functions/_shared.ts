@@ -27,6 +27,7 @@ export interface R2Bucket {
 export interface Env {
   DB?: D1Database;
   SCREENSHOTS?: R2Bucket;
+  GITHUB_TOKEN?: string;
   ADMIN_USERNAME?: string;
   ADMIN_PASSWORD?: string;
   ADMIN_SESSION_SECRET?: string;
