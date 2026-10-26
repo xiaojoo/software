@@ -37,6 +37,7 @@
 - Preserve the five current local D1 records’ IDs, object keys, sizes, and sort orders exactly.
 
 - [ ] Fetch each named object from local Wrangler R2 with `npx wrangler r2 object get yuanji-hub-screenshots/<objectKey> --local --file assets/screenshots/<objectKey>`.
+- [ ] Create `assets/screenshots/` before exporting the first object.
 - [ ] Write manifest rows from the already inspected local D1 metadata; include only rows with `deleting_at IS NULL`.
 - [ ] Compare each exported file size with its metadata size and confirm PNG headers before continuing; keep `.wrangler` bucket untouched.
 - [ ] Run `npm run build` to confirm the existing asset-copy step includes the new directory.
@@ -105,7 +106,6 @@
 **Files:**
 - Create: `.github/workflows/deploy-pages.yml`
 - Modify: `README.md`
-- Modify: `.gitignore` only if needed for local secret handling.
 
 **Interfaces:**
 - Workflow triggers on pushes to `main` and manual dispatch; checks out the repository, runs `npm ci`, `npm run build`, and `npx wrangler pages deploy dist --project-name yuanji-hub --branch main`.
