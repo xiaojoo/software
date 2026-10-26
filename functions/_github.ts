@@ -146,6 +146,7 @@ function isScreenshotRecord(value: unknown): value is ScreenshotRecord {
   const key = SCREENSHOT_KEY_PATTERN.exec(item.objectKey);
   return Boolean(key)
     && key![1] === item.softwareId
+    && key![2] === item.id
     && MIME_BY_EXTENSION[key![3]] === item.mimeType
     && item.path === `/assets/screenshots/${item.objectKey}`
     && Number.isSafeInteger(item.sizeBytes)
