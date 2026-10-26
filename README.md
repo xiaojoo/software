@@ -1,27 +1,32 @@
-# Software Finder
+# 源集：开源软件项目与版本信息
 
-Static frontend built with native HTML, CSS, JavaScript modules, and Web Components. Cloudflare Pages Functions provide the API layer, and Cloudflare D1 stores reviews and aggregate activity counts.
+本项目使用原生 HTML、CSS、JavaScript 模块和 Web Components 构建静态前端；Cloudflare Pages Functions 提供 API，Cloudflare D1 保存评论和统计数据。
 
-## Software sources
+## 软件来源
 
-The catalog tracks releases from `xiaojoo/book`, `video`, `music`, `wallpaper`, `phone-camera`, and `SmartClip`. `/api/software` fetches each repository's latest published GitHub Release and asset download counts. GitHub responses are cached at the edge for 15 minutes. The checked-in values in `src/data/software.js` are fallbacks for API outages. SmartClip currently has no published GitHub Release, so its profile links to the repository.
+软件目录跟踪 `xiaojoo/book`、`video`、`music`、`wallpaper`、`phone-camera` 和 `SmartClip` 仓库。
 
-## Local development
+- `/api/software` 获取各仓库最新的 GitHub Release 和资源下载次数。
+- GitHub API 响应会在边缘缓存 15 分钟。
+- GitHub API 不可用时，使用 `src/data/software.js` 中保存的备用数据。
+- SmartClip 暂无已发布的 GitHub Release，因此详情页链接到其 GitHub 仓库。
+
+## 本地开发
 
 ```sh
 npm install
 npm run dev
 ```
 
-`npm run dev` first copies the current site sources and the admin interface into `dist`, then starts Cloudflare Pages locally.
+`npm run dev` 会先将网站源文件和后台界面复制到 `dist`，再启动本地 Cloudflare Pages 开发服务器。
 
-For local D1 data, create a local database using the binding in `wrangler.toml`, then apply migrations:
+本地 D1 数据库使用 `wrangler.toml` 中的绑定。创建本地数据库后应用迁移：
 
 ```sh
 npm run db:migrate:local
 ```
 
-Create a local `.dev.vars` file for the admin credentials and session signing secret (this file is ignored by Git):
+在项目根目录创建本地 `.dev.vars`，配置后台账号、密码和会话签名密钥。该文件已加入 `.gitignore`，不会提交到 Git：
 
 ```dotenv
 ADMIN_USERNAME=your-admin-name
@@ -29,33 +34,33 @@ ADMIN_PASSWORD=use-a-long-unique-password
 ADMIN_SESSION_SECRET=replace-with-a-random-secret-at-least-32-characters-long
 ```
 
-Wrangler uses a local R2 simulation for development. Local uploads are separate from production; create the `yuanji-hub-screenshots` bucket in Cloudflare before deploying screenshot storage.
+Wrangler 会在本地模拟 R2 存储。开发环境的上传内容与生产环境隔离。部署截图存储前，请在 Cloudflare 创建 `yuanji-hub-screenshots` 存储桶。
 
-## Cloudflare setup
+## Cloudflare 配置
 
-The production project is already bound to the free D1 database `software-finder-db` as `DB`. Its initial migration has been applied. To set up a separate Cloudflare account or environment, create a database:
+生产项目已绑定免费的 D1 数据库 `software-finder-db`，绑定名为 `DB`。如果要配置其他 Cloudflare 账号或环境，先创建数据库：
 
 ```sh
 npm run db:create
 ```
 
-Add the generated `database_id` to both the top-level and production `d1_databases` blocks in `wrangler.toml` (the binding name must be `DB`), then apply the schema and seed rows:
+将命令生成的 `database_id` 填入 `wrangler.toml` 顶层和生产环境的 `d1_databases` 配置中，并确认绑定名为 `DB`，然后应用数据库结构和初始数据：
 
 ```sh
 npm run db:migrate:remote
 ```
 
-Deploy with Wrangler so Cloudflare compiles the root-level `functions/` directory:
+部署包含 `functions/` 目录的 Pages 项目时，请使用 Wrangler 编译并部署：
 
 ```sh
 npm run deploy
 ```
 
-### Admin login and screenshot storage
+### 后台登录与截图存储
 
-Create the R2 bucket named `yuanji-hub-screenshots` in Cloudflare. The `SCREENSHOTS` binding is declared in both the local and production Wrangler configurations. For another bucket name, update both `r2_buckets` entries in `wrangler.toml`.
+在 Cloudflare 创建名为 `yuanji-hub-screenshots` 的 R2 存储桶。`SCREENSHOTS` 绑定已写入本地和生产环境配置。如需更换存储桶名称，请同步修改 `wrangler.toml` 中的两处 `r2_buckets` 配置。
 
-Set production login credentials as Worker secrets; use a unique password and a cryptographically random session secret:
+在 Cloudflare Worker 中设置生产环境后台凭据：
 
 ```sh
 npx wrangler pages secret put ADMIN_USERNAME --project-name yuanji-hub
@@ -63,20 +68,19 @@ npx wrangler pages secret put ADMIN_PASSWORD --project-name yuanji-hub
 npx wrangler pages secret put ADMIN_SESSION_SECRET --project-name yuanji-hub
 ```
 
-Apply migrations to the production D1 database before deploying the new Functions:
+部署 Functions 前，请先对生产 D1 数据库应用迁移：
 
 ```sh
 npm run db:migrate:remote
 npm run deploy
 ```
 
-Open `/admin/` on the deployed site to manage reviews and software screenshots. Uploaded PNG, JPEG, or WebP images are limited to 10 MiB each. The public product page displays screenshots vertically in the saved order; products without screenshots have no screenshot section.
+部署后访问网站的 `/admin/`，即可管理评论和软件截图。截图支持 PNG、JPEG 和 WebP 格式，每张最大 10 MiB。前台按后台保存的顺序纵向展示截图；未配置截图的软件不会显示截图区域。
 
-Cloudflare Dashboard drag-and-drop deployment does not compile Pages Functions; use Wrangler for deployments containing the `functions/` directory.
+Cloudflare Dashboard 的拖放部署不会编译 Pages Functions。包含 `functions/` 的部署请使用 Wrangler。
 
-## Data recorded
+## 数据记录
 
-- Software profile views and download clicks are aggregate counters in D1. No raw IP address or visitor identifier is stored. A download click is recorded immediately before redirecting to the public GitHub asset; it does not claim to measure a completed file transfer.
-- Reviews store a 1–5 rating, plain text plus a limited formatting tree (bold, italics, lists, quotes), and submission time. Formatting is rendered from an allowlisted node structure; submitted HTML is never interpreted.
-
-The API is same-origin. Review submissions remain immediately public and can be hidden or deleted in `/admin/`; add a separate anti-spam measure before opening review submission to a large public audience.
+- 软件详情访问量和下载点击量以汇总计数形式保存在 D1，不保存原始 IP 地址或访客标识。点击下载时会先记录一次，再跳转到 GitHub 资源；该计数不代表文件已完整下载。
+- 评论保存 1 至 5 星评分、纯文本与受限格式树（粗体、斜体、列表、引用）以及提交时间。页面只渲染允许的节点结构，不会将用户提交的 HTML 当作 HTML 执行。
+- API 与网站使用同源地址。评论提交后会立即公开；可在 `/admin/` 隐藏或删除评论。若要面向大量访客开放评论，请先增加独立的反垃圾措施。
