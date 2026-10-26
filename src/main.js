@@ -13,7 +13,6 @@ const explorer = document.querySelector('category-explorer');
 const comparison = document.querySelector('comparison-section');
 const testimonial = document.querySelector('testimonial-section');
 const productDetail = document.querySelector('product-detail');
-const homeTitle = document.title;
 let activeProductId = null;
 
 // Home-page refreshes should open at the top instead of restoring a previous section.
@@ -81,7 +80,6 @@ function syncProductRoute() {
     if (selected) {
       productDetail.product = selected;
       document.body.classList.add('is-product-detail');
-      document.title = `${selected.name} | 软件项目与最新版本`;
       const sectionId = match[2] === 'reviews' ? 'product-reviews' : null;
       if (sectionId) requestAnimationFrame(() => document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' }));
       else window.scrollTo({ top: 0, behavior: 'instant' });
@@ -95,7 +93,6 @@ function syncProductRoute() {
 
   activeProductId = null;
   document.body.classList.remove('is-product-detail');
-  document.title = homeTitle;
   const sectionId = window.location.hash.slice(1);
   if (sectionId && sectionId !== 'top') {
     requestAnimationFrame(() => document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' }));
