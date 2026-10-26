@@ -4,6 +4,13 @@ const API_ROOT = 'https://api.github.com/repos/xiaojoo/software';
 const API_VERSION = '2022-11-28';
 const BRANCH = 'main';
 const MANIFEST_PATH = 'assets/screenshots/manifest.json';
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const SCREENSHOT_KEY_PATTERN = /^([a-z0-9]+(?:-[a-z0-9]+)*)-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.(png|jpg|webp)$/;
+const MIME_BY_EXTENSION: Record<string, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  webp: 'image/webp',
+};
 
 export interface ScreenshotRecord {
   id: string;
@@ -81,9 +88,31 @@ async function githubFetch(env: Env, path: string, init: RequestInit = {}) {
     throw new ScreenshotRepositoryError('截图仓库分支已被其他操作更新，请刷新列表后重试。', 'conflict', response.status);
   }
   if (!response.ok) {
+    if (response.status === 422) {
+      let githubMessage = '';
+      try {
+        const error = await response.clone().json() as { message?: unknown };
+        if (typeof error.message === 'string') githubMessage = error.message.toLowerCase();
+      } catch {
+        // Keep the response classification generic when GitHub does not return JSON.
+      }
+      const isRefUpdate = init.method === 'PATCH' && path === `/git/refs/heads/${BRANCH}`;
+      if (isRefUpdate && /(not a fast[ -]?forward|non.fast.forward|fast.forward update)/.test(githubMessage)) {
+        throw new ScreenshotRepositoryError(
+          '截图仓库分支已被其他操作更新，请刷新列表后重试。',
+          'conflict',
+          response.status,
+        );
+      }
+      throw new ScreenshotRepositoryError(
+        'GitHub 拒绝了截图仓库更新（HTTP 422），请检查分支保护规则和提交内容。',
+        'github-error',
+        response.status,
+      );
+    }
     throw new ScreenshotRepositoryError(
       `GitHub 截图仓库请求失败（HTTP ${response.status}）。`,
-      response.status === 422 ? 'conflict' : 'github-error',
+      'github-error',
       response.status,
     );
   }
@@ -109,14 +138,19 @@ function encodeBase64(bytes: Uint8Array) {
 function isScreenshotRecord(value: unknown): value is ScreenshotRecord {
   if (!value || typeof value !== 'object') return false;
   const item = value as Record<string, unknown>;
-  return typeof item.id === 'string'
-    && typeof item.softwareId === 'string'
-    && typeof item.objectKey === 'string'
-    && typeof item.path === 'string'
-    && item.path.startsWith('/assets/screenshots/')
-    && typeof item.mimeType === 'string'
+  if (typeof item.id !== 'string' || !UUID_PATTERN.test(item.id)
+    || typeof item.softwareId !== 'string'
+    || typeof item.objectKey !== 'string'
+    || typeof item.path !== 'string'
+    || typeof item.mimeType !== 'string') return false;
+  const key = SCREENSHOT_KEY_PATTERN.exec(item.objectKey);
+  return Boolean(key)
+    && key![1] === item.softwareId
+    && MIME_BY_EXTENSION[key![3]] === item.mimeType
+    && item.path === `/assets/screenshots/${item.objectKey}`
     && Number.isSafeInteger(item.sizeBytes)
     && Number(item.sizeBytes) > 0
+    && Number(item.sizeBytes) <= 10 * 1024 * 1024
     && Number.isSafeInteger(item.order)
     && Number(item.order) >= 0
     && typeof item.createdAt === 'string';
@@ -201,7 +235,7 @@ export async function commitScreenshotChanges(
   const paths = new Set<string>();
   for (const change of changes) {
     const validPath = change.path === MANIFEST_PATH
-      || /^assets\/screenshots\/[a-z0-9-]+\.(?:png|jpg|webp)$/.test(change.path);
+      || /^assets\/screenshots\/[a-z0-9]+(?:-[a-z0-9]+)*-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(?:png|jpg|webp)$/.test(change.path);
     if (!validPath || paths.has(change.path)) {
       throw new Error('截图变更路径无效或重复。');
     }
