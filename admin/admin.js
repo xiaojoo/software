@@ -459,22 +459,18 @@ async function uploadScreenshots(event) {
   }
   const button = event.currentTarget.querySelector('button[type="submit"]');
   button.disabled = true;
-  let uploaded = 0;
   try {
-    for (const file of files) {
-      setStatus(status, `正在上传 ${uploaded + 1}/${files.length}：${file.name}`);
-      const form = new FormData();
-      form.set('softwareId', state.softwareId);
-      form.set('image', file);
-      await api('/api/admin/screenshots', { method: 'POST', body: form });
-      uploaded += 1;
-    }
+    setStatus(status, `正在保存 ${files.length} 张截图到 GitHub…`);
+    const form = new FormData();
+    form.set('softwareId', state.softwareId);
+    files.forEach((file) => form.append('image', file));
+    const { count = files.length } = await api('/api/admin/screenshots', { method: 'POST', body: form });
     input.value = '';
     updateFileSelectionFeedback();
-    setStatus(status, `已上传 ${uploaded} 张图片。`);
+    setStatus(status, `已保存 ${count} 张截图到 GitHub，网站将在部署完成后更新。`);
     await loadScreenshots();
   } catch (error) {
-    setStatus(status, `${uploaded} 张已上传；${error.message}`, true);
+    setStatus(status, error.message, true);
     await loadScreenshots();
   } finally { button.disabled = false; }
 }

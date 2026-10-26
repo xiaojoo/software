@@ -1,16 +1,6 @@
 import { isSameOrigin, requireAdmin } from '../../_admin';
+import { commitScreenshotChanges, readScreenshotManifest, type ScreenshotRecord } from '../../_github';
 import { findSoftware, json, type PagesContext } from '../../_shared';
-
-interface ScreenshotRow {
-  id: string;
-  software_id: string;
-  object_key: string;
-  mime_type: string;
-  size_bytes: number;
-  sort_order: number;
-  deleting_at: string | null;
-  created_at: string;
-}
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -22,32 +12,38 @@ async function detectMime(file: File) {
   return '';
 }
 
-function publicRow(row: ScreenshotRow) {
+function publicRow(row: ScreenshotRecord) {
   return {
     id: row.id,
-    softwareId: row.software_id,
-    url: `/media/${encodeURIComponent(row.object_key)}`,
-    mimeType: row.mime_type,
-    sizeBytes: row.size_bytes,
-    order: row.sort_order,
-    pendingCleanup: row.deleting_at !== null,
-    createdAt: row.created_at,
+    softwareId: row.softwareId,
+    url: row.path,
+    mimeType: row.mimeType,
+    sizeBytes: row.sizeBytes,
+    order: row.order,
+    pendingCleanup: false,
+    createdAt: row.createdAt,
   };
+}
+
+function errorResponse(error: unknown, fallback: string) {
+  const message = error instanceof Error ? error.message : fallback;
+  return json({ error: message || fallback }, 503, { 'Cache-Control': 'no-store' });
 }
 
 export async function onRequestGet(context: PagesContext) {
   const denied = await requireAdmin(context);
   if (denied) return denied;
-  if (!context.env.DB) return json({ error: 'Database is not configured.' }, 503);
   const softwareId = new URL(context.request.url).searchParams.get('software') ?? '';
   if (!findSoftware(softwareId)) return json({ error: 'Unknown software.' }, 400);
   try {
-    const { results } = await context.env.DB.prepare(
-      'SELECT id, software_id, object_key, mime_type, size_bytes, sort_order, deleting_at, created_at FROM software_screenshots WHERE software_id = ? ORDER BY deleting_at IS NOT NULL, sort_order, created_at',
-    ).bind(softwareId).all<ScreenshotRow>();
-    return json({ screenshots: results.map(publicRow) }, 200, { 'Cache-Control': 'no-store' });
-  } catch {
-    return json({ error: 'Unable to load screenshots.' }, 503);
+    const manifest = await readScreenshotManifest(context.env);
+    const screenshots = manifest.screenshots
+      .filter((item) => item.softwareId === softwareId)
+      .sort((a, b) => a.order - b.order)
+      .map(publicRow);
+    return json({ screenshots }, 200, { 'Cache-Control': 'no-store' });
+  } catch (error) {
+    return errorResponse(error, '无法从 GitHub 读取截图清单。');
   }
 }
 
@@ -55,35 +51,47 @@ export async function onRequestPost(context: PagesContext) {
   const denied = await requireAdmin(context);
   if (denied) return denied;
   if (!isSameOrigin(context.request)) return json({ error: 'Request origin is not allowed.' }, 403);
-  if (!context.env.DB || !context.env.SCREENSHOTS) return json({ error: 'Screenshot storage is not configured.' }, 503);
 
   let form: FormData;
   try { form = await context.request.formData(); } catch { return json({ error: 'Invalid multipart form.' }, 400); }
   const softwareId = String(form.get('softwareId') ?? '');
-  const image = form.get('image');
+  const images = form.getAll('image');
   if (!findSoftware(softwareId)) return json({ error: 'Unknown software.' }, 400);
-  if (!(image instanceof File) || image.size === 0 || image.size > MAX_BYTES) return json({ error: '图片不能为空，且不能超过 10 MiB。' }, 400);
-  const mimeType = await detectMime(image);
-  if (!mimeType || mimeType !== image.type) return json({ error: '仅支持有效的 PNG、JPEG 或 WebP 图片。' }, 400);
+  if (!images.length || images.some((image) => !(image instanceof File) || image.size === 0 || image.size > MAX_BYTES)) {
+    return json({ error: '请选择图片，且每张图片不能超过 10 MiB。' }, 400);
+  }
 
-  const id = crypto.randomUUID();
-  const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType.slice('image/'.length);
-  const objectKey = `${softwareId}-${id}.${extension}`;
+  const files = images as File[];
+  const validated: Array<{ file: File; mimeType: string }> = [];
+  for (const file of files) {
+    const mimeType = await detectMime(file);
+    if (!mimeType || mimeType !== file.type) return json({ error: '仅支持有效的 PNG、JPEG 或 WebP 图片。' }, 400);
+    validated.push({ file, mimeType });
+  }
+
   try {
-    const current = await context.env.DB.prepare('SELECT COALESCE(MAX(sort_order), -1) AS max_order FROM software_screenshots WHERE software_id = ? AND deleting_at IS NULL').bind(softwareId).first<{ max_order: number }>();
-    await context.env.SCREENSHOTS.put(objectKey, await image.arrayBuffer(), { httpMetadata: { contentType: mimeType } });
-    try {
-      await context.env.DB.prepare(
-        'INSERT INTO software_screenshots (id, software_id, object_key, mime_type, size_bytes, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      ).bind(id, softwareId, objectKey, mimeType, image.size, Number(current?.max_order ?? -1) + 1, new Date().toISOString()).run();
-    } catch (error) {
-      await context.env.SCREENSHOTS.delete(objectKey).catch(() => undefined);
-      throw error;
+    const manifest = await readScreenshotManifest(context.env);
+    const productScreenshots = manifest.screenshots.filter((item) => item.softwareId === softwareId);
+    let nextOrder = productScreenshots.reduce((max, item) => Math.max(max, item.order), -1) + 1;
+    const now = new Date().toISOString();
+    const records: ScreenshotRecord[] = [];
+    const changes: Array<{ path: string; bytes: Uint8Array }> = [];
+
+    for (const { file, mimeType } of validated) {
+      const id = crypto.randomUUID();
+      const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType.slice('image/'.length);
+      const objectKey = `${softwareId}-${id}.${extension}`;
+      const path = `assets/screenshots/${objectKey}`;
+      records.push({ id, softwareId, objectKey, path: `/assets/screenshots/${objectKey}`, mimeType, sizeBytes: file.size, order: nextOrder++, createdAt: now });
+      changes.push({ path, bytes: new Uint8Array(await file.arrayBuffer()) });
     }
-    const row: ScreenshotRow = { id, software_id: softwareId, object_key: objectKey, mime_type: mimeType, size_bytes: image.size, sort_order: Number(current?.max_order ?? -1) + 1, deleting_at: null, created_at: new Date().toISOString() };
-    return json({ screenshot: publicRow(row) }, 201, { 'Cache-Control': 'no-store' });
-  } catch {
-    return json({ error: 'Unable to save this screenshot.' }, 503);
+
+    const updated = { version: 1 as const, screenshots: [...manifest.screenshots, ...records] };
+    changes.push({ path: 'assets/screenshots/manifest.json', bytes: new TextEncoder().encode(`${JSON.stringify(updated, null, 2)}\n`) });
+    await commitScreenshotChanges(context.env, `Add ${records.length} screenshot${records.length === 1 ? '' : 's'} for ${softwareId}`, changes);
+    return json({ screenshots: records.map(publicRow), count: records.length }, 201, { 'Cache-Control': 'no-store' });
+  } catch (error) {
+    return errorResponse(error, '无法保存截图到 GitHub。');
   }
 }
 
@@ -91,7 +99,6 @@ export async function onRequestPatch(context: PagesContext) {
   const denied = await requireAdmin(context);
   if (denied) return denied;
   if (!isSameOrigin(context.request)) return json({ error: 'Request origin is not allowed.' }, 403);
-  if (!context.env.DB) return json({ error: 'Database is not configured.' }, 503);
   let body: { softwareId?: unknown; orderedIds?: unknown };
   try { body = await context.request.json(); } catch { return json({ error: 'Invalid JSON body.' }, 400); }
   const softwareId = typeof body.softwareId === 'string' ? body.softwareId : '';
@@ -100,18 +107,23 @@ export async function onRequestPatch(context: PagesContext) {
     return json({ error: 'Invalid screenshot order.' }, 400);
   }
   try {
-    const { results } = await context.env.DB.prepare('SELECT id FROM software_screenshots WHERE software_id = ? AND deleting_at IS NULL').bind(softwareId).all<{ id: string }>();
-    const currentIds = results.map((row) => row.id).sort();
+    const manifest = await readScreenshotManifest(context.env);
+    const current = manifest.screenshots.filter((item) => item.softwareId === softwareId).sort((a, b) => a.order - b.order);
+    const currentIds = current.map((item) => item.id).sort();
     const requestedIds = [...ids as string[]].sort();
-    if (currentIds.length !== requestedIds.length || currentIds.some((id, index) => id !== requestedIds[index])) return json({ error: 'Screenshot order must include every active screenshot exactly once.' }, 400);
-    if (requestedIds.length) {
-      const statements = (ids as string[]).map((id, sortOrder) => context.env.DB!.prepare(
-        'UPDATE software_screenshots SET sort_order = ? WHERE id = ? AND software_id = ? AND deleting_at IS NULL',
-      ).bind(sortOrder, id, softwareId));
-      await context.env.DB.batch(statements);
+    if (currentIds.length !== requestedIds.length || currentIds.some((id, index) => id !== requestedIds[index])) {
+      return json({ error: '截图列表已变化，请刷新后再排序。' }, 409);
     }
-    return json({ orderedIds: ids });
-  } catch {
-    return json({ error: 'Unable to save screenshot order.' }, 503);
+    const orderById = new Map((ids as string[]).map((id, order) => [id, order]));
+    const screenshots = manifest.screenshots.map((item) => item.softwareId === softwareId
+      ? { ...item, order: orderById.get(item.id)! }
+      : item);
+    const updated = { version: 1 as const, screenshots };
+    await commitScreenshotChanges(context.env, `Reorder screenshots for ${softwareId}`, [
+      { path: 'assets/screenshots/manifest.json', bytes: new TextEncoder().encode(`${JSON.stringify(updated, null, 2)}\n`) },
+    ]);
+    return json({ orderedIds: ids }, 200, { 'Cache-Control': 'no-store' });
+  } catch (error) {
+    return errorResponse(error, '无法保存截图顺序。');
   }
 }
