@@ -34,7 +34,11 @@ ADMIN_PASSWORD=use-a-long-unique-password
 ADMIN_SESSION_SECRET=replace-with-a-random-secret-at-least-32-characters-long
 ```
 
-Wrangler 会在本地模拟 R2 存储。开发环境的上传内容与生产环境隔离。部署截图存储前，请在 Cloudflare 创建 `yuanji-hub-screenshots` 存储桶。
+本地后台上传截图需要在 `.dev.vars` 中配置有 `xiaojoo/software` 仓库 Contents 写权限的 GitHub fine-grained token：
+
+```dotenv
+GITHUB_TOKEN=your-github-fine-grained-token
+```
 
 ## Cloudflare 配置
 
@@ -56,9 +60,9 @@ npm run db:migrate:remote
 npm run deploy
 ```
 
-### 后台登录与截图存储
+### 后台登录与截图发布
 
-在 Cloudflare 创建名为 `yuanji-hub-screenshots` 的 R2 存储桶。`SCREENSHOTS` 绑定已写入本地和生产环境配置。如需更换存储桶名称，请同步修改 `wrangler.toml` 中的两处 `r2_buckets` 配置。
+后台登录使用 Cloudflare Pages production secrets：
 
 在 Cloudflare Worker 中设置生产环境后台凭据：
 
@@ -66,7 +70,17 @@ npm run deploy
 npx wrangler pages secret put ADMIN_USERNAME --project-name yuanji-hub
 npx wrangler pages secret put ADMIN_PASSWORD --project-name yuanji-hub
 npx wrangler pages secret put ADMIN_SESSION_SECRET --project-name yuanji-hub
+npx wrangler pages secret put GITHUB_TOKEN --project-name yuanji-hub
 ```
+
+`GITHUB_TOKEN` 使用 GitHub fine-grained personal access token，资源所有者选 `xiaojoo`、仓库只选 `software`，Repository permissions 仅授予 `Contents: Read and write`。此 token 只由 Pages Function 在服务端使用，不会发送到浏览器。
+
+仓库已配置 GitHub Actions 工作流 `.github/workflows/deploy-pages.yml`。在 GitHub 仓库的 **Settings → Secrets and variables → Actions** 添加：
+
+- `CLOUDFLARE_API_TOKEN`：Cloudflare API token，权限为 **Account → Cloudflare Pages → Edit**。
+- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 账号 ID。
+
+配置完成后，每次向 `main` 推送代码（包括后台管理图片形成的提交），工作流会构建并部署到 Pages。也可以在 GitHub **Actions** 页面手动运行 “Deploy Cloudflare Pages”。Cloudflare Pages Direct Upload 项目由该工作流通过 Wrangler 部署，不需要绑定 Git Provider。
 
 部署 Functions 前，请先对生产 D1 数据库应用迁移：
 
@@ -75,7 +89,7 @@ npm run db:migrate:remote
 npm run deploy
 ```
 
-部署后访问网站的 `/admin/`，即可管理评论和软件截图。截图支持 PNG、JPEG 和 WebP 格式，每张最大 10 MiB。前台按后台保存的顺序纵向展示截图；未配置截图的软件不会显示截图区域。
+访问网站的 `/admin/`，即可管理评论和软件截图。截图文件保存在仓库的 `assets/screenshots/`，清单位于 `assets/screenshots/manifest.json`；每款软件支持多张 PNG、JPEG 或 WebP 图片，每张最大 10 MiB。后台一次保存一组图片到 GitHub，并触发一次自动部署。前台按后台保存的顺序纵向展示截图；未配置截图的软件不会显示截图区域。
 
 Cloudflare Dashboard 的拖放部署不会编译 Pages Functions。包含 `functions/` 的部署请使用 Wrangler。
 
