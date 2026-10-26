@@ -64,7 +64,7 @@ npm run deploy
 
 后台登录使用 Cloudflare Pages production secrets：
 
-在 Cloudflare Worker 中设置生产环境后台凭据：
+在 Cloudflare Pages Functions 中设置 production 环境后台凭据：
 
 ```sh
 npx wrangler pages secret put ADMIN_USERNAME --project-name yuanji-hub
@@ -98,3 +98,4 @@ Cloudflare Dashboard 的拖放部署不会编译 Pages Functions。包含 `funct
 - 软件详情访问量和下载点击量以汇总计数形式保存在 D1，不保存原始 IP 地址或访客标识。点击下载时会先记录一次，再跳转到 GitHub 资源；该计数不代表文件已完整下载。
 - 评论保存 1 至 5 星评分、纯文本与受限格式树（粗体、斜体、列表、引用）以及提交时间。页面只渲染允许的节点结构，不会将用户提交的 HTML 当作 HTML 执行。
 - API 与网站使用同源地址。评论提交后会立即公开；可在 `/admin/` 隐藏或删除评论。若要面向大量访客开放评论，请先增加独立的反垃圾措施。
+
