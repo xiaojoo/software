@@ -1,0 +1,21 @@
+:root {
+  color-scheme: light;
+  --ink: #242a31;
+  --muted: #5d6874;
+  --subtle: #7f8994;
+  --blue: #2364f5;
+  --blue-dark: #174bc6;
+  --blue-soft: #eaf5fc;
+  --line: #e1e5e9;
+  --surface: #ffffff;
+  --surface-soft: #f7f8f9;
+  --green: #3d9d59;
+  --amber: #f7b72c;
+  --red: #ef786f;
+  --radius-sm: 0.55rem;
+  --radius-md: 0.85rem;
+  --radius-lg: 1.15rem;
+  --shadow-card: 0 2px 5px rgb(29 45 66 / 8%), 0 1px 1px rgb(29 45 66 / 5%);
+  --content-width: 71rem;
+  --font-body: Arial, Helvetica, "Segoe UI", sans-serif;
+}
