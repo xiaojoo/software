@@ -383,11 +383,26 @@ function renderScreenshotCard(screenshot, index, all) {
   const article = document.createElement('article');
   article.className = `screenshot-card ${screenshot.pendingCleanup ? 'is-pending' : ''}`;
   if (!screenshot.pendingCleanup) {
+    const preview = document.createElement('div');
+    preview.className = 'screenshot-preview is-loading';
+    preview.setAttribute('aria-busy', 'true');
     const image = document.createElement('img');
-    image.src = screenshot.url;
     image.alt = `${products.find((product) => product.id === state.softwareId)?.name ?? '软件'}截图 ${index + 1}`;
     image.loading = 'lazy';
-    article.append(image);
+    image.decoding = 'async';
+    image.addEventListener('load', () => {
+      preview.classList.remove('is-loading');
+      preview.setAttribute('aria-busy', 'false');
+    }, { once: true });
+    image.addEventListener('error', () => {
+      preview.classList.remove('is-loading');
+      preview.classList.add('is-error');
+      preview.setAttribute('aria-busy', 'false');
+      image.remove();
+    }, { once: true });
+    preview.append(image);
+    article.append(preview);
+    image.src = screenshot.url;
   }
   const details = document.createElement('div');
   details.className = 'screenshot-details';

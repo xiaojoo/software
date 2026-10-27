@@ -278,18 +278,23 @@ class ProductDetail extends HTMLElement {
         .forEach((screenshot, index) => {
         if (typeof screenshot.path !== 'string' || !screenshot.path.startsWith('/assets/screenshots/')) return;
         const figure = document.createElement('figure');
-        figure.className = 'product-screenshot-image';
+        figure.className = 'product-screenshot-image is-loading';
+        figure.setAttribute('aria-busy', 'true');
         const image = document.createElement('img');
-        image.src = screenshot.path;
         image.alt = `${this._product.name}截图 ${index + 1}`;
         image.loading = 'lazy';
         image.decoding = 'async';
+        image.addEventListener('load', () => {
+          figure.classList.remove('is-loading');
+          figure.setAttribute('aria-busy', 'false');
+        }, { once: true });
         image.addEventListener('error', () => {
           figure.remove();
           if (!list.children.length) hideShowcase();
         }, { once: true });
         figure.append(image);
         list.append(figure);
+        image.src = screenshot.path;
       });
       if (!list.children.length) return;
 
