@@ -19,13 +19,22 @@ const marks = {
 };
 
 document.addEventListener('error', (event) => {
-  if (event.target instanceof HTMLImageElement && event.target.classList.contains('product-logo-image')) event.target.remove();
+  if (event.target instanceof HTMLImageElement && event.target.classList.contains('product-logo-image')) {
+    event.target.closest('.product-logo')?.classList.remove('is-loading');
+    event.target.remove();
+  }
+}, true);
+document.addEventListener('load', (event) => {
+  if (event.target instanceof HTMLImageElement && event.target.classList.contains('product-logo-image')) {
+    event.target.closest('.product-logo')?.classList.remove('is-loading');
+  }
 }, true);
 
 export function productLogo(product, extraClass = '') {
   const mark = marks[product.logo] ?? `<text x="16" y="22" text-anchor="middle" font-size="17" font-weight="700" fill="currentColor">${product.symbol ?? product.name[0]}</text>`;
   const image = product.iconUrl ? `<img class="product-logo-image" src="${product.iconUrl}" alt="" loading="lazy" decoding="async" />` : '';
-  return `<span class="product-logo logo-${product.logo} ${extraClass}" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false">${mark}</svg>${image}</span>`;
+  const imageLoading = product.iconUrl ? 'has-image is-loading' : '';
+  return `<span class="product-logo logo-${product.logo} ${imageLoading} ${extraClass}" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false">${mark}</svg>${image}</span>`;
 }
 
 export const ratingStar = '<svg class="rating-star" viewBox="0 0 20 20" aria-hidden="true"><path d="m10 1.7 2.55 5.17 5.71.83-4.13 4.02.97 5.68L10 14.72l-5.1 2.68.97-5.68L1.74 7.7l5.71-.83z"/></svg>';

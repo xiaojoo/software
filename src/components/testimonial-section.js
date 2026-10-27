@@ -1,4 +1,4 @@
-import { productLogo } from '../product-logo.js';
+import { productLogo } from '../product-logo.js?v=home-image-skeleton-20261027';
 import { softwareCatalog } from '../data/software.js';
 
 const number = (value) => Number(value ?? 0).toLocaleString('zh-CN');

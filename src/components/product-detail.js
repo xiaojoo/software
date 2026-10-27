@@ -1,4 +1,4 @@
-import { productLogo } from '../product-logo.js';
+import { productLogo } from '../product-logo.js?v=home-image-skeleton-20261027';
 
 export function productSlug(product) {
   return product.id ?? product.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

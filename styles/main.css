@@ -313,7 +313,9 @@ buying-guide { display: block; }
 .hero-form .search-icon { width: .95rem; height: .95rem; }
 .product-logo { position: relative; overflow: hidden; background: #fff; }
 .product-logo svg { display: block; width: 76%; height: 76%; }
-.product-logo-image { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; padding: .12rem; object-fit: contain; background: white; }
+.product-logo-image { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; padding: .12rem; opacity: 0; object-fit: contain; background: white; transition: opacity 160ms ease; }
+.product-logo:not(.is-loading) .product-logo-image { opacity: 1; }
+.product-logo.has-image.is-loading::after { position: absolute; z-index: 2; inset: 0; background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 72%) 48%, transparent 72%); content: ''; transform: translateX(-100%); animation: screenshot-shimmer 1.35s ease-in-out infinite; }
 .logo-tempo { background: #ffe4ec; }
 .logo-structure { background: #e92724; }
 .logo-celoxis { background: #f5fcfe; }
@@ -391,7 +393,7 @@ body.is-product-detail > product-detail { display: block; }
 .product-screenshot-image.is-loading::after, .screenshot-preview.is-loading::after { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 65%) 48%, transparent 72%); content: ''; transform: translateX(-100%); animation: screenshot-shimmer 1.35s ease-in-out infinite; }
 .product-screenshot-image img { display: block; width: 100%; height: auto; }
 @keyframes screenshot-shimmer { to { transform: translateX(100%); } }
-@media (prefers-reduced-motion: reduce) { .product-screenshot-image.is-loading::after, .screenshot-preview.is-loading::after { animation: none; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .product-screenshot-image.is-loading::after, .screenshot-preview.is-loading::after, .product-logo.has-image.is-loading::after { animation: none; transform: none; } }
 .product-showcase-image { overflow: hidden; aspect-ratio: 16 / 9; margin: 0; border: 1px solid rgb(255 255 255 / 80%); border-radius: var(--radius-md); background: #e9edf5; box-shadow: 0 1rem 2.5rem rgb(24 45 65 / 17%); }
 .product-showcase-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .product-detail-section { padding-block: 0 clamp(2.8rem, 5vw, 4rem); scroll-margin-top: 6rem; }

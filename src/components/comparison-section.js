@@ -1,4 +1,4 @@
-import { productLogo } from '../product-logo.js';
+import { productLogo } from '../product-logo.js?v=home-image-skeleton-20261027';
 import { productPageHref } from './product-detail.js';
 
 const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
