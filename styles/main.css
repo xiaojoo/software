@@ -629,6 +629,10 @@ body { font-size: 1rem; }
   .comparison-grid { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 560px) {
+  .software-release-card { min-height: 11.5rem; }
+}
+
 /* Comparison section typography calibrated to the supplied desktop reference. */
 .compare-heading .section-title { font-size: clamp(1.9rem, 2.2vw, 2.3rem); line-height: 1.15; }
 .compare-heading p { font-size: 1rem; line-height: 1.35; }
