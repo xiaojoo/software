@@ -511,8 +511,8 @@ body.is-product-detail > product-detail { display: block; }
 .comparison-product-link > span > span { color: var(--muted); font-size: .78rem; }
 .release-date { margin: .25rem 0 .8rem; color: var(--muted); font-size: .75rem; }
 .release-card-stats { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: auto; color: var(--muted); font-size: .7rem; }
-.software-release-card .release-card-stats { margin-top: .3rem; }
-.software-release-card .card-actions { margin-top: .6rem; padding-top: 0; }
+.software-release-card .release-card-stats { margin-top: .55rem; }
+.software-release-card .card-actions { margin-top: .85rem; padding-top: 0; }
 .release-card-stats b { color: var(--ink); }
 .release-metric-row { display: flex; justify-content: space-between; gap: .6rem; border-top: 1px solid #f0f2f4; padding: .45rem 0; color: var(--muted); font-size: .75rem; }
 .release-metric-row b { color: var(--ink); text-align: right; }
@@ -596,19 +596,20 @@ body { font-size: 1rem; }
 .guide-steps strong { font-size: .96rem; }
 .trust-copy h2 { font-size: clamp(1.8rem, 2.4vw, 2.2rem); }
 .testimonial-card blockquote { font-size: clamp(1.15rem, 1.7vw, 1.55rem); }
+.software-release-card { min-height: 18rem; padding: 1rem; }
 @media (max-width: 980px) {
   .primary-navigation { font-size: .74rem; }
-  .software-card { min-height: 20rem; }
+  .software-release-card { min-height: 16.5rem; }
 }
 @media (max-width: 760px) {
   .hero-card { min-height: 18rem; }
   .hero-content h1 { font-size: clamp(2rem, 8vw, 2.8rem); }
   .section-title { font-size: 1.55rem; }
-  .software-card { min-height: 18rem; }
+  .software-release-card { min-height: 15rem; }
 }
 @media (max-width: 560px) {
   .section-title { font-size: 1.42rem; }
-  .software-card { min-height: 14.2rem; padding: 1rem; }
+  .software-release-card { min-height: 13rem; padding: .75rem 1rem; }
   .product-heading h3 { font-size: .94rem; }
   .rating { font-size: .78rem; }
   .product-verdict { font-size: .84rem; }
