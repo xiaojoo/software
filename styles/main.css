@@ -510,10 +510,10 @@ body.is-product-detail > product-detail { display: block; }
 .comparison-product-link strong { overflow: hidden; color: var(--ink); font-size: .875rem; text-overflow: ellipsis; white-space: nowrap; }
 .comparison-product-link > span > span { color: var(--muted); font-size: .78rem; }
 .release-date { margin: .25rem 0 .8rem; color: var(--muted); font-size: .75rem; }
-.release-card-meta { display: flex; align-items: center; justify-content: space-between; gap: .65rem; padding-top: 1.75rem; margin-top: 2.1rem; border-top: 1px solid #e6f0fa; }
+.release-card-meta { display: flex; align-items: center; justify-content: space-between; gap: .65rem; padding-top: 1.5rem; margin-top: 2.35rem; border-top: 1px solid #e6f0fa; }
 .release-card-meta .release-date { margin: 0; white-space: nowrap; }
 .release-card-stats { display: flex; flex: 0 0 auto; flex-wrap: nowrap; gap: .35rem .75rem; margin-top: 0; color: var(--muted); font-size: .9rem; white-space: nowrap; }
-.software-release-card .card-actions { margin-top: 1.8rem; padding-top: 0; }
+.software-release-card .card-actions { gap: .85rem; margin-top: 2.35rem; padding-top: 0; }
 .release-card-stats b { color: var(--ink); }
 .release-metric-row { display: flex; justify-content: space-between; gap: .6rem; border-top: 1px solid #f0f2f4; padding: .45rem 0; color: var(--muted); font-size: .75rem; }
 .release-metric-row b { color: var(--ink); text-align: right; }
@@ -599,11 +599,13 @@ body { font-size: 1rem; }
 .testimonial-card blockquote { font-size: clamp(1.15rem, 1.7vw, 1.55rem); }
 .software-release-card { min-height: 22.25rem; padding: 1.75rem; border-color: #dce9f7; border-radius: 1.2rem; box-shadow: 0 3px 12px rgb(26 62 99 / 8%); }
 .software-release-card .product-logo { width: 4rem; flex-basis: 4rem; border-radius: .8rem; }
-.software-release-card .product-heading h3 { font-size: 1.3rem; }
-.software-release-card .rating { font-size: .95rem; }
+.software-release-card .product-card-link { gap: 1.65rem; }
+.software-release-card .product-heading { transform: translateY(2px); }
+.software-release-card .product-heading h3 { font-size: 1.4rem; }
+.software-release-card .rating { margin-top: .7rem; font-size: .95rem; }
 .software-release-card .product-badge { padding: .3rem .6rem; font-size: .78rem; }
-.software-release-card .product-verdict { margin: 2.35rem 0 0; font-size: 1rem; }
-.software-release-card .release-date { font-size: .9rem; }
+.software-release-card .product-verdict { margin: 2.15rem 0 0; font-size: 1.05rem; }
+.software-release-card .release-date { font-size: 1rem; }
 .software-release-card .card-actions .button { min-height: 3.2rem; font-size: .9rem; }
 @media (max-width: 980px) {
   .primary-navigation { font-size: .74rem; }
@@ -617,7 +619,8 @@ body { font-size: 1rem; }
 }
 @media (max-width: 560px) {
   .section-title { font-size: 1.42rem; }
-  .software-release-card { min-height: 22.25rem; padding: 1.75rem; }
+  .category-section.page-width { width: calc(100% - .2rem); }
+  .software-release-card { min-height: 22.25rem; padding: 1.75rem 1.75rem 1.55rem; }
   .review-count { font-size: .72rem; }
   .sentiment-heading { font-size: .74rem; }
   .sentiment-labels { font-size: .65rem; }
