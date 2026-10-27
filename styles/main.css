@@ -511,6 +511,8 @@ body.is-product-detail > product-detail { display: block; }
 .comparison-product-link > span > span { color: var(--muted); font-size: .78rem; }
 .release-date { margin: .25rem 0 .8rem; color: var(--muted); font-size: .75rem; }
 .release-card-stats { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: auto; color: var(--muted); font-size: .7rem; }
+.software-release-card .release-card-stats { margin-top: .3rem; }
+.software-release-card .card-actions { margin-top: .6rem; padding-top: 0; }
 .release-card-stats b { color: var(--ink); }
 .release-metric-row { display: flex; justify-content: space-between; gap: .6rem; border-top: 1px solid #f0f2f4; padding: .45rem 0; color: var(--muted); font-size: .75rem; }
 .release-metric-row b { color: var(--ink); text-align: right; }
