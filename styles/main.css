@@ -64,6 +64,17 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 site-header { display: block; position: sticky; z-index: 10; top: 0; background: rgb(255 255 255 / 96%); border-bottom: 1px solid #eef0f2; backdrop-filter: blur(12px); }
+.site-header-skeleton { display: flex; align-items: center; width: min(75rem, calc(100% - clamp(2rem, 8vw, 7rem))); min-height: 4.25rem; margin-inline: auto; gap: clamp(1rem, 2vw, 2rem); }
+.site-header-skeleton > i { position: relative; display: block; flex: 0 0 auto; overflow: hidden; border-radius: .4rem; background: #e9edf1; }
+.site-header-skeleton > i::after { position: absolute; inset: 0; content: ""; background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 78%) 48%, transparent 72%); transform: translateX(-100%); animation: screenshot-shimmer 1.35s ease-in-out infinite; }
+.header-skeleton-mark { width: 1.8rem; height: 1.8rem; border-radius: .5rem !important; }
+.header-skeleton-brand { width: 2.65rem; height: 1.1rem; margin-left: -.45rem; }
+.header-skeleton-search { width: clamp(9rem, 15vw, 13.5rem); height: 2.35rem; margin-left: -.6rem; border-radius: 999px !important; }
+.header-skeleton-link { width: 3.25rem; height: .75rem; }
+.header-skeleton-link:nth-of-type(5) { width: 2.9rem; }
+.header-skeleton-spacer { flex: 1 1 auto !important; background: transparent !important; }
+.header-skeleton-action { width: 5.7rem; height: 2.35rem; border-radius: 999px !important; }
+.header-skeleton-menu { display: none !important; }
 .site-header-inner { display: flex; align-items: center; width: min(75rem, calc(100% - clamp(2rem, 8vw, 7rem))); min-height: 4.25rem; margin-inline: auto; gap: clamp(1rem, 2vw, 2rem); }
 .brand { display: inline-flex; align-items: center; gap: .45rem; flex: 0 0 auto; color: #26364d; font-size: 1.23rem; font-weight: 750; letter-spacing: -.045em; text-decoration: none; }
 .brand-mark { width: 1.8rem; height: 1.8rem; overflow: visible; }
@@ -274,6 +285,9 @@ buying-guide { display: block; }
 @media (max-width: 760px) {
   .category-tabs { flex-wrap: wrap; justify-content: flex-start; gap: .3rem .55rem; margin-right: 0; overflow: visible; scrollbar-width: none; }
   .category-tabs button { flex: 0 0 auto; padding: .55rem .45rem .7rem; }
+  .site-header-skeleton { min-height: 3.8rem; justify-content: space-between; }
+  .site-header-skeleton > .header-skeleton-search, .site-header-skeleton > .header-skeleton-link, .site-header-skeleton > .header-skeleton-action { display: none; }
+  .site-header-skeleton > .header-skeleton-menu { display: block !important; width: 2.5rem; height: 2.5rem; border: 1px solid #e4e8ec; border-radius: .55rem !important; }
   .site-header-inner { position: relative; min-height: 3.8rem; justify-content: space-between; }
   .nav-toggle { display: grid; width: 2.5rem; height: 2.5rem; align-content: center; justify-items: center; gap: .27rem; padding: .4rem; border: 1px solid var(--line); border-radius: .55rem; background: white; cursor: pointer; }
   .nav-toggle span { display: block; width: 1rem; height: 2px; border-radius: 2px; background: #39424c; }
