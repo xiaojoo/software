@@ -60,6 +60,36 @@
       "sizeBytes": 91857,
       "order": 0,
       "createdAt": "2026-10-27T06:22:37.903Z"
+    },
+    {
+      "id": "ca5118ae-32eb-498e-922c-e53727f695e3",
+      "softwareId": "phone-camera",
+      "objectKey": "phone-camera-ca5118ae-32eb-498e-922c-e53727f695e3.png",
+      "path": "/assets/screenshots/phone-camera-ca5118ae-32eb-498e-922c-e53727f695e3.png",
+      "mimeType": "image/png",
+      "sizeBytes": 95648,
+      "order": 0,
+      "createdAt": "2026-10-27T06:30:11.406Z"
+    },
+    {
+      "id": "4bd8d81e-343e-4e5c-8773-48cdaa53bed0",
+      "softwareId": "phone-camera",
+      "objectKey": "phone-camera-4bd8d81e-343e-4e5c-8773-48cdaa53bed0.png",
+      "path": "/assets/screenshots/phone-camera-4bd8d81e-343e-4e5c-8773-48cdaa53bed0.png",
+      "mimeType": "image/png",
+      "sizeBytes": 110218,
+      "order": 1,
+      "createdAt": "2026-10-27T06:30:11.406Z"
+    },
+    {
+      "id": "d81bdbf9-114d-4dc8-a086-f061c04b1d8a",
+      "softwareId": "phone-camera",
+      "objectKey": "phone-camera-d81bdbf9-114d-4dc8-a086-f061c04b1d8a.png",
+      "path": "/assets/screenshots/phone-camera-d81bdbf9-114d-4dc8-a086-f061c04b1d8a.png",
+      "mimeType": "image/png",
+      "sizeBytes": 865031,
+      "order": 2,
+      "createdAt": "2026-10-27T06:30:11.406Z"
     }
   ]
 }
