@@ -12,27 +12,43 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles/tokens.css" />
-    <link rel="stylesheet" href="./styles/main.css?v=home-image-skeleton-20261027" />
-    <script type="module" src="./src/main.js?v=home-image-skeleton-20261027"></script>
+    <link rel="stylesheet" href="./styles/main.css?v=home-page-skeleton-20261027" />
+    <script type="module" src="./src/main.js?v=home-page-skeleton-20261027"></script>
   </head>
-  <body id="top">
+  <body id="top" class="is-loading">
     <site-header></site-header>
     <main>
       <section class="page-width intro-section" aria-label="查找软件">
-        <hero-search></hero-search>
+        <hero-search>
+          <div class="home-skeleton home-skeleton-hero" aria-hidden="true">
+            <span class="skeleton-line skeleton-hero-title"></span>
+            <span class="skeleton-line skeleton-hero-copy"></span>
+            <span class="skeleton-control"></span>
+            <span class="skeleton-line skeleton-hero-stats"></span>
+          </div>
+        </hero-search>
       </section>
       <section class="page-width category-section" id="categories" aria-labelledby="categories-title">
         <h2 class="section-title" id="categories-title">探索软件与最新版本</h2>
-        <category-explorer></category-explorer>
+        <category-explorer>
+          <div class="home-skeleton home-skeleton-catalog" aria-hidden="true">
+            <div class="skeleton-tabs"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="skeleton-cards">
+              <div class="skeleton-card"><div><i></i><b></b></div><i></i><i></i><i></i></div>
+              <div class="skeleton-card"><div><i></i><b></b></div><i></i><i></i><i></i></div>
+              <div class="skeleton-card"><div><i></i><b></b></div><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </category-explorer>
       </section>
       <section class="page-width compare-section" id="compare" aria-labelledby="compare-title">
-        <comparison-section></comparison-section>
+        <comparison-section><div class="home-skeleton home-skeleton-lower" aria-hidden="true"><i></i><i></i><i></i></div></comparison-section>
       </section>
       <section class="guide-band" id="guide">
-        <div class="page-width"><buying-guide></buying-guide></div>
+        <div class="page-width"><buying-guide><div class="home-skeleton home-skeleton-guide" aria-hidden="true"><i></i><i></i></div></buying-guide></div>
       </section>
       <section class="page-width trust-section" id="reviews">
-        <testimonial-section></testimonial-section>
+        <testimonial-section><div class="home-skeleton home-skeleton-lower" aria-hidden="true"><i></i><i></i><i></i></div></testimonial-section>
       </section>
     </main>
     <product-detail></product-detail>

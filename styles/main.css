@@ -16,6 +16,29 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .button-outline:hover { background: #f3f7ff; }
 .button-warm { color: #fff; background: #ff9d2f; }
 .section-title { margin: 0; text-align: center; font-size: clamp(1.45rem, 2.4vw, 1.9rem); line-height: 1.2; letter-spacing: -.035em; }
+.home-skeleton { display: grid; gap: 1rem; }
+.home-skeleton-hero { min-height: clamp(17rem, 31vw, 25rem); align-content: center; justify-items: center; padding: 2rem; border: 1px solid #dceaf1; border-radius: var(--radius-lg); background: linear-gradient(142deg, #f3f8fb, #f8fbfd 55%, #f4f7f9); box-shadow: var(--shadow-card); }
+.skeleton-line, .skeleton-control, .skeleton-card, .home-skeleton-lower > i, .home-skeleton-guide > i { position: relative; overflow: hidden; border-radius: .5rem; background: #e9edf1; }
+.skeleton-line::after, .skeleton-control::after, .skeleton-card::after, .home-skeleton-lower > i::after, .home-skeleton-guide > i::after { position: absolute; inset: 0; content: ""; background: linear-gradient(100deg, transparent 25%, rgb(255 255 255 / 78%) 48%, transparent 72%); transform: translateX(-100%); animation: screenshot-shimmer 1.35s ease-in-out infinite; }
+.skeleton-hero-title { width: min(22rem, 70%); height: 2.8rem; }
+.skeleton-hero-copy { width: min(30rem, 86%); height: 1rem; margin-top: .2rem; }
+.skeleton-control { width: min(37rem, 100%); height: 3.4rem; margin-top: .8rem; border-radius: 999px; background: #e7ebef; }
+.skeleton-hero-stats { width: min(25rem, 80%); height: 1.25rem; margin-top: .7rem; }
+.home-skeleton-catalog { gap: 1.15rem; }
+.skeleton-tabs { display: flex; gap: 1.15rem; overflow: hidden; padding: .6rem .3rem .8rem; border-bottom: 1px solid #edf0f2; }
+.skeleton-tabs i { width: 5rem; height: .9rem; flex: 0 0 auto; border-radius: 999px; background: #e9edf1; }
+.skeleton-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.15rem; }
+.skeleton-card { display: grid; min-height: 14.8rem; align-content: start; gap: 1rem; padding: 1rem; border: 1px solid #e5e7ea; border-radius: var(--radius-md); background: #fff; box-shadow: var(--shadow-card); }
+.skeleton-card > div { display: flex; align-items: center; gap: .65rem; }
+.skeleton-card > div i { width: 2.05rem; height: 2.05rem; flex: 0 0 auto; border-radius: .5rem; background: #e9edf1; }
+.skeleton-card > div b { width: 45%; height: 1rem; border-radius: 999px; background: #e9edf1; }
+.skeleton-card > i { width: 82%; height: .75rem; border-radius: 999px; background: #edf0f2; }
+.skeleton-card > i:nth-last-child(1) { width: 60%; }
+.home-skeleton-lower { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-skeleton-lower > i { min-height: 12rem; border: 1px solid #e5e7ea; background: #f7f8fa; }
+.home-skeleton-guide { grid-template-columns: 1.4fr 1fr; min-height: 12rem; }
+.home-skeleton-guide > i { min-height: 10rem; border: 1px solid #e5e7ea; background: #eceff2; }
+.is-app-ready .home-skeleton { display: none; }
 .intro-section { padding-top: 1.25rem; }
 .category-section { padding-top: clamp(3rem, 6vw, 5rem); }
 .category-section .section-title { margin-bottom: 1.7rem; }
@@ -35,6 +58,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .recommendation-banner { align-items: flex-start; flex-wrap: wrap; }
   .recommendation-banner > .button { margin-left: 3.7rem; }
   .site-footer { flex-direction: column; padding-inline: 1rem; }
+  .skeleton-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
@@ -272,6 +296,10 @@ buying-guide { display: block; }
 }
 @media (max-width: 560px) {
   body { font-size: .9rem; }
+  .skeleton-cards, .home-skeleton-lower, .home-skeleton-guide { grid-template-columns: 1fr; }
+  .skeleton-card:nth-child(n + 2) { display: none; }
+  .home-skeleton-hero { min-height: 17rem; padding-inline: 1rem; }
+  .skeleton-hero-title { height: 2rem; }
   .source-note-facts { grid-template-columns: 1fr; }
   .page-width { width: calc(100% - 1.35rem); }
   .intro-section { padding-top: .7rem; }

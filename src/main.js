@@ -106,4 +106,5 @@ function syncProductRoute() {
 
 window.addEventListener('hashchange', syncProductRoute);
 syncProductRoute();
+document.body.classList.add('is-app-ready');
 void loadCatalog();
