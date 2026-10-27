@@ -510,8 +510,9 @@ body.is-product-detail > product-detail { display: block; }
 .comparison-product-link strong { overflow: hidden; color: var(--ink); font-size: .875rem; text-overflow: ellipsis; white-space: nowrap; }
 .comparison-product-link > span > span { color: var(--muted); font-size: .78rem; }
 .release-date { margin: .25rem 0 .8rem; color: var(--muted); font-size: .75rem; }
-.release-card-stats { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: auto; color: var(--muted); font-size: .7rem; }
-.software-release-card .release-card-stats { margin-top: auto; }
+.release-card-meta { display: flex; align-items: center; justify-content: space-between; gap: .65rem; margin-top: auto; }
+.release-card-meta .release-date { margin: 0; white-space: nowrap; }
+.release-card-stats { display: flex; flex: 0 0 auto; flex-wrap: nowrap; gap: .35rem .75rem; margin-top: 0; color: var(--muted); font-size: .7rem; white-space: nowrap; }
 .software-release-card .card-actions { margin-top: auto; padding-top: .8rem; }
 .release-card-stats b { color: var(--ink); }
 .release-metric-row { display: flex; justify-content: space-between; gap: .6rem; border-top: 1px solid #f0f2f4; padding: .45rem 0; color: var(--muted); font-size: .75rem; }

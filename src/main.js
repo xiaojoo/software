@@ -1,6 +1,6 @@
 import './components/site-header.js';
 import './components/hero-search.js';
-import './components/software-card.js';
+import './components/software-card.js?v=release-card-meta-20261027';
 import { productSlug } from './components/product-detail.js';
 import './components/category-explorer.js';
 import './components/comparison-section.js';

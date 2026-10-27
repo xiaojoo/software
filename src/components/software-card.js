@@ -20,8 +20,7 @@ class SoftwareCard extends HTMLElement {
           <span class="product-badge">${release ? escapeHtml(release.tag) : '暂无版本'}</span>
         </div>
         <p class="product-verdict">${escapeHtml(p.verdict)}</p>
-        <p class="release-date">${release ? `最新版本 · ${new Date(release.publishedAt).toLocaleDateString('zh-CN')}` : '尚未发布 GitHub 版本'}</p>
-        <div class="release-card-stats"><span><b>${Number(p.metrics?.downloads ?? 0).toLocaleString()}</b> 次下载</span><span><b>${Number(p.metrics?.views ?? 0).toLocaleString()}</b> 次访问</span></div>
+        <div class="release-card-meta"><span class="release-date">${release ? `最新版本 · ${new Date(release.publishedAt).toLocaleDateString('zh-CN')}` : '尚未发布 GitHub 版本'}</span><div class="release-card-stats"><span><b>${Number(p.metrics?.downloads ?? 0).toLocaleString()}</b> 次下载</span><span><b>${Number(p.metrics?.views ?? 0).toLocaleString()}</b> 次访问</span></div></div>
         <div class="card-actions"><a class="button button-outline" href="${productPageHref(p)}">查看详情</a>${assets.length ? `<a class="button button-primary" href="/api/downloads/${encodeURIComponent(p.id)}?asset=0">立即下载</a>` : `<a class="button button-primary" href="${escapeHtml(p.githubUrl)}" target="_blank" rel="noreferrer">查看仓库 <span aria-hidden="true">↗</span></a>`}</div>
       </article>`;
   }
