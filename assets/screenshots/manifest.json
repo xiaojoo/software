@@ -50,6 +50,16 @@
       "sizeBytes": 1193719,
       "order": 2,
       "createdAt": "2026-10-26T15:25:06.343Z"
+    },
+    {
+      "id": "6b1e2312-6932-449d-b5df-b9610fe87feb",
+      "softwareId": "smartclip",
+      "objectKey": "smartclip-6b1e2312-6932-449d-b5df-b9610fe87feb.png",
+      "path": "/assets/screenshots/smartclip-6b1e2312-6932-449d-b5df-b9610fe87feb.png",
+      "mimeType": "image/png",
+      "sizeBytes": 91857,
+      "order": 0,
+      "createdAt": "2026-10-27T06:22:37.903Z"
     }
   ]
 }
