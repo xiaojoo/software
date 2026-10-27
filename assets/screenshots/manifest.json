@@ -90,6 +90,46 @@
       "sizeBytes": 865031,
       "order": 2,
       "createdAt": "2026-10-27T06:30:11.406Z"
+    },
+    {
+      "id": "b56030f1-0589-4742-92bf-a9023414802f",
+      "softwareId": "music",
+      "objectKey": "music-b56030f1-0589-4742-92bf-a9023414802f.webp",
+      "path": "/assets/screenshots/music-b56030f1-0589-4742-92bf-a9023414802f.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 693232,
+      "order": 0,
+      "createdAt": "2026-10-27T07:12:10.198Z"
+    },
+    {
+      "id": "d22c923d-5337-45aa-8af3-ec8c5927fdbd",
+      "softwareId": "music",
+      "objectKey": "music-d22c923d-5337-45aa-8af3-ec8c5927fdbd.webp",
+      "path": "/assets/screenshots/music-d22c923d-5337-45aa-8af3-ec8c5927fdbd.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 172060,
+      "order": 1,
+      "createdAt": "2026-10-27T07:12:10.198Z"
+    },
+    {
+      "id": "183b149d-3c4a-41e6-9001-3616881675b4",
+      "softwareId": "music",
+      "objectKey": "music-183b149d-3c4a-41e6-9001-3616881675b4.webp",
+      "path": "/assets/screenshots/music-183b149d-3c4a-41e6-9001-3616881675b4.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 184940,
+      "order": 2,
+      "createdAt": "2026-10-27T07:12:10.198Z"
+    },
+    {
+      "id": "beab3274-970e-4f52-9274-4aa31459b8bc",
+      "softwareId": "music",
+      "objectKey": "music-beab3274-970e-4f52-9274-4aa31459b8bc.webp",
+      "path": "/assets/screenshots/music-beab3274-970e-4f52-9274-4aa31459b8bc.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 126336,
+      "order": 3,
+      "createdAt": "2026-10-27T07:12:10.198Z"
     }
   ]
 }
