@@ -176,3 +176,78 @@ export async function incrementMetric(db: D1Database | undefined, id: string, co
   const row = await db.prepare('SELECT page_views, download_clicks FROM software_metrics WHERE software_id = ?').bind(id).first<{ page_views: number; download_clicks: number }>();
   return { views: row?.page_views ?? 0, downloads: row?.download_clicks ?? 0 };
 }
+
+const visitorTextEncoder = new TextEncoder();
+const visitorKeySalt = visitorTextEncoder.encode('yuanji-hub:visitor-ip:v1');
+const visitorAadPrefix = visitorTextEncoder.encode('yuanji-hub:visitor-ip:v1:');
+const VIEW_DEDUPE_SECONDS = 2 * 60 * 60;
+
+function bytesToHex(bytes: Uint8Array) {
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToBytes(value: string) {
+  if (!/^(?:[0-9a-f]{2})+$/i.test(value)) throw new Error('Invalid encrypted IP data.');
+  return Uint8Array.from(value.match(/.{2}/g)!, (byte) => Number.parseInt(byte, 16));
+}
+
+async function visitorKeys(secret: string) {
+  const master = await crypto.subtle.importKey('raw', visitorTextEncoder.encode(secret), 'HKDF', false, ['deriveKey']);
+  const derive = (purpose: string, algorithm: HmacImportParams | AesKeyGenParams, usages: KeyUsage[]) => crypto.subtle.deriveKey({
+    name: 'HKDF',
+    hash: 'SHA-256',
+    salt: visitorKeySalt,
+    info: visitorTextEncoder.encode(`yuanji-hub:visitor-ip:${purpose}:v1`),
+  }, master, algorithm, false, usages);
+  const [fingerprint, encryption] = await Promise.all([
+    derive('fingerprint', { name: 'HMAC', hash: 'SHA-256', length: 256 }, ['sign']),
+    derive('encryption', { name: 'AES-GCM', length: 256 }, ['encrypt', 'decrypt']),
+  ]);
+  return { fingerprint, encryption };
+}
+
+async function encryptVisitorIp(ip: string, softwareId: string, key: CryptoKey) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const additionalData = new Uint8Array([...visitorAadPrefix, ...visitorTextEncoder.encode(softwareId)]);
+  const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData }, key, visitorTextEncoder.encode(ip)));
+  return `v1.${bytesToHex(iv)}.${bytesToHex(ciphertext)}`;
+}
+
+async function decryptVisitorIp(value: string, softwareId: string, key: CryptoKey) {
+  const [version, ivHex, ciphertextHex, ...rest] = value.split('.');
+  if (version !== 'v1' || !ivHex || !ciphertextHex || rest.length) throw new Error('Invalid encrypted IP data.');
+  const additionalData = new Uint8Array([...visitorAadPrefix, ...visitorTextEncoder.encode(softwareId)]);
+  const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: hexToBytes(ivHex), additionalData }, key, hexToBytes(ciphertextHex));
+  return new TextDecoder('utf-8', { fatal: true }).decode(plaintext);
+}
+
+export async function countUniquePageView(db: D1Database, softwareId: string, ip: string, secret: string) {
+  const keys = await visitorKeys(secret);
+  const fingerprintInput = visitorTextEncoder.encode(`${softwareId}\u0000${ip}`);
+  const fingerprint = bytesToHex(new Uint8Array(await crypto.subtle.sign('HMAC', keys.fingerprint, fingerprintInput)));
+  const encryptedIp = await encryptVisitorIp(ip, softwareId, keys.encryption);
+  const now = Math.floor(Date.now() / 1000);
+  const cutoff = now - VIEW_DEDUPE_SECONDS;
+  const counted = await db.prepare(`
+    INSERT INTO software_view_visitors (software_id, ip_fingerprint, ip_encrypted, last_counted_at)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT (software_id, ip_fingerprint) DO UPDATE SET
+      ip_encrypted = excluded.ip_encrypted,
+      last_counted_at = excluded.last_counted_at
+    WHERE software_view_visitors.last_counted_at <= ?
+    RETURNING last_counted_at
+  `).bind(softwareId, fingerprint, encryptedIp, now, cutoff).first<{ last_counted_at: number }>();
+
+  if (!counted) {
+    const stored = await db.prepare('SELECT ip_encrypted FROM software_view_visitors WHERE software_id = ? AND ip_fingerprint = ?')
+      .bind(softwareId, fingerprint).first<{ ip_encrypted: string }>();
+    if (!stored || await decryptVisitorIp(stored.ip_encrypted, softwareId, keys.encryption) !== ip) {
+      throw new Error('Unable to verify the encrypted visitor record.');
+    }
+  }
+
+  await db.prepare('DELETE FROM software_view_visitors WHERE last_counted_at <= ?').bind(cutoff).run();
+  const metrics = await db.prepare('SELECT page_views, download_clicks FROM software_metrics WHERE software_id = ?')
+    .bind(softwareId).first<{ page_views: number; download_clicks: number }>();
+  return { views: metrics?.page_views ?? 0, downloads: metrics?.download_clicks ?? 0 };
+}
