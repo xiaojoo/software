@@ -615,7 +615,8 @@ body { font-size: 1rem; }
 }
 @media (max-width: 560px) {
   .section-title { font-size: 1.42rem; }
-  .software-release-card { min-height: 16.2rem; padding: 1rem 1rem 1.7rem; }
+  .software-release-card { min-height: 14.2rem; padding: 1rem 1rem 1.7rem; }
+  .software-release-card .card-actions { padding-top: .75rem; }
   .product-heading h3 { font-size: .94rem; }
   .rating { font-size: .78rem; }
   .product-verdict { font-size: .84rem; }
