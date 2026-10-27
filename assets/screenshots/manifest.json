@@ -130,6 +130,36 @@
       "sizeBytes": 126336,
       "order": 3,
       "createdAt": "2026-10-27T07:12:10.198Z"
+    },
+    {
+      "id": "a924f713-695e-40fa-9bbb-371e64579f36",
+      "softwareId": "book",
+      "objectKey": "book-a924f713-695e-40fa-9bbb-371e64579f36.webp",
+      "path": "/assets/screenshots/book-a924f713-695e-40fa-9bbb-371e64579f36.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 94448,
+      "order": 0,
+      "createdAt": "2026-10-27T07:14:07.500Z"
+    },
+    {
+      "id": "20a693bb-dd5b-4d08-93f9-d275fa04c11f",
+      "softwareId": "book",
+      "objectKey": "book-20a693bb-dd5b-4d08-93f9-d275fa04c11f.webp",
+      "path": "/assets/screenshots/book-20a693bb-dd5b-4d08-93f9-d275fa04c11f.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 41956,
+      "order": 1,
+      "createdAt": "2026-10-27T07:14:07.500Z"
+    },
+    {
+      "id": "260069f0-7ee8-4991-93eb-35d8fc306330",
+      "softwareId": "book",
+      "objectKey": "book-260069f0-7ee8-4991-93eb-35d8fc306330.webp",
+      "path": "/assets/screenshots/book-260069f0-7ee8-4991-93eb-35d8fc306330.webp",
+      "mimeType": "image/webp",
+      "sizeBytes": 259794,
+      "order": 2,
+      "createdAt": "2026-10-27T07:14:07.500Z"
     }
   ]
 }
